@@ -1,0 +1,18 @@
+{
+	"node": "n8n-nodes-sendtick.sendtick",
+	"nodeVersion": "1.0",
+	"codexVersion": "1.0",
+	"categories": ["Communication", "Messaging"],
+	"resources": {
+		"credentialDocumentation": [
+			{
+				"url": "https://sendtick.co/docs/api"
+			}
+		],
+		"primaryDocumentation": [
+			{
+				"url": "https://sendtick.co/docs/api"
+			}
+		]
+	}
+}
