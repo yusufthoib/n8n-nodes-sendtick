@@ -141,25 +141,7 @@ export class Sendtick implements INodeType {
 
 					returnData.push({ json: response as any });
 				} else if (resource === 'contact') {
-					if (operation === 'create') {
-						const phone = this.getNodeParameter('phone', i) as string;
-						const name = this.getNodeParameter('name', i) as string;
-						const email = this.getNodeParameter('email', i) as string;
-
-						const body: { [key: string]: any } = { phone };
-						if (name) body.name = name;
-						if (email) body.email = email;
-
-						const response = await this.helpers.requestWithAuthentication.call(this, 'sendtickApi', {
-							method: 'POST',
-							baseURL: BASE_URL,
-							url: '/contacts',
-							body,
-							json: true,
-						});
-
-						returnData.push({ json: response as any });
-					} else if (operation === 'get') {
+					if (operation === 'get') {
 						const contactId = this.getNodeParameter('contactId', i) as string;
 						const response = await this.helpers.requestWithAuthentication.call(this, 'sendtickApi', {
 							method: 'GET',
@@ -192,34 +174,6 @@ export class Sendtick implements INodeType {
 							qs,
 							json: true,
 						});
-						returnData.push({ json: response as any });
-					} else if (operation === 'update') {
-						const contactId = this.getNodeParameter('contactId', i) as string;
-						const name = this.getNodeParameter('name', i) as string;
-						const email = this.getNodeParameter('email', i) as string;
-
-						const body: { [key: string]: any } = {};
-						if (name) body.name = name;
-						if (email) body.email = email;
-
-						const response = await this.helpers.requestWithAuthentication.call(this, 'sendtickApi', {
-							method: 'PUT',
-							baseURL: BASE_URL,
-							url: `/contacts/${contactId}`,
-							body,
-							json: true,
-						});
-
-						returnData.push({ json: response as any });
-					} else if (operation === 'delete') {
-						const contactId = this.getNodeParameter('contactId', i) as string;
-						const response = await this.helpers.requestWithAuthentication.call(this, 'sendtickApi', {
-							method: 'DELETE',
-							baseURL: BASE_URL,
-							url: `/contacts/${contactId}`,
-							json: true,
-						});
-
 						returnData.push({ json: response as any });
 					}
 

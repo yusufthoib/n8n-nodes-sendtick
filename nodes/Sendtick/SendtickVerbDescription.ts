@@ -42,18 +42,6 @@ export const sendtickOperations: INodeProperties[] = [
 		},
 		options: [
 			{
-				name: 'Create',
-				value: 'create',
-				description: 'Create a contact',
-				action: 'Create contact',
-			},
-			{
-				name: 'Delete',
-				value: 'delete',
-				description: 'Delete a contact',
-				action: 'Delete contact',
-			},
-			{
 				name: 'Get',
 				value: 'get',
 				description: 'Get a single contact',
@@ -64,12 +52,6 @@ export const sendtickOperations: INodeProperties[] = [
 				value: 'getAll',
 				description: 'Get many contacts',
 				action: 'Get many contacts',
-			},
-			{
-				name: 'Update',
-				value: 'update',
-				description: 'Update a contact',
-				action: 'Update contact',
 			},
 		],
 		default: 'getAll',
@@ -171,65 +153,23 @@ const sendOperation: INodeProperties[] = [
 /* -------------------------------------------------------------------------- */
 /*                                contact operations                           */
 /* -------------------------------------------------------------------------- */
-const contactCreate: INodeProperties[] = [
-	{
-		displayName: 'Phone',
-		name: 'phone',
-		type: 'string',
-		default: '',
-		required: true,
-		description: 'Phone number with country code (E.164 preferred)',
-		displayOptions: {
-			show: {
-				resource: ['contact'],
-				operation: ['create'],
-			},
-		},
-	},
-	{
-		displayName: 'Name',
-		name: 'name',
-		type: 'string',
-		default: '',
-		description: 'Contact display name',
-		displayOptions: {
-			show: {
-				resource: ['contact'],
-				operation: ['create'],
-			},
-		},
-	},
-	{
-		displayName: 'Email',
-		name: 'email',
-		type: 'string',
-		default: '',
-		description: 'Optional contact email',
-		placeholder: 'name@email.com',
-		displayOptions: {
-			show: {
-				resource: ['contact'],
-				operation: ['create'],
-			},
-		},
-	},
-];
+// contact create removed: Sendtick API does not provide create/delete/update operations in this integration
 
 const contactGet: INodeProperties[] = [
-	{
-		displayName: 'Contact ID',
-		name: 'contactId',
-		type: 'string',
-		default: '',
-		required: true,
-		description: 'ID of the contact to retrieve',
-		displayOptions: {
-			show: {
-				resource: ['contact'],
-				operation: ['get','update','delete'],
-			},
-		},
-	},
+ 	{
+ 		displayName: 'Contact ID',
+ 		name: 'contactId',
+ 		type: 'string',
+ 		default: '',
+ 		required: true,
+ 		description: 'ID of the contact to retrieve',
+ 		displayOptions: {
+ 			show: {
+ 				resource: ['contact'],
+ 				operation: ['get'],
+ 			},
+ 		},
+ 	},
 ];
 
 const contactGetAll: INodeProperties[] = [
@@ -320,48 +260,7 @@ const contactGetAll: INodeProperties[] = [
 	},
 ];
 
-const contactUpdate: INodeProperties[] = [
-	{
-		displayName: 'Contact ID',
-		name: 'contactId',
-		type: 'string',
-		default: '',
-		required: true,
-		displayOptions: {
-			show: {
-				resource: ['contact'],
-				operation: ['update'],
-			},
-		},
-	},
-	{
-		displayName: 'Name',
-		name: 'name',
-		type: 'string',
-		default: '',
-		description: 'New display name',
-		displayOptions: {
-			show: {
-				resource: ['contact'],
-				operation: ['update'],
-			},
-		},
-	},
-	{
-		displayName: 'Email',
-		name: 'email',
-		type: 'string',
-		default: '',
-		description: 'New email',
-		placeholder: 'name@email.com',
-		displayOptions: {
-			show: {
-				resource: ['contact'],
-				operation: ['update'],
-			},
-		},
-	},
-];
+// contact update removed: Sendtick API does not provide create/delete/update operations in this integration
 
 
 /* -------------------------------------------------------------------------- */
@@ -424,10 +323,8 @@ export const sendtickFields: INodeProperties[] = [
 	/* -------------------------------------------------------------------------- */
 	/*                                contact operations                          */
 	/* -------------------------------------------------------------------------- */
-	...contactCreate,
 	...contactGet,
 	...contactGetAll,
-	...contactUpdate,
 
 
 	/* -------------------------------------------------------------------------- */

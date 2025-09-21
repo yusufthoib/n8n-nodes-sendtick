@@ -1,10 +1,10 @@
 # n8n-nodes-sendtick-v1
 
-Lightweight n8n node set to interact with Sendtick (v1) APIs. Provides operations for sending messages, creating contacts, and querying sessions from n8n workflows.
+Lightweight n8n node set to interact with Sendtick (v1) APIs. Provides operations for sending messages, searching/listing contacts, and querying sessions from n8n workflows.
 
 ## Features
 - Send messages
-- Create or update contacts
+-- Search or list contacts
 - Query message status
 - Simple API-key based credential
 
@@ -46,7 +46,7 @@ Sendtick node (resources: message | contact | session)
 	- Example: send a transactional message to a phone or chat id.
 
 - Resource: contact
-	- Operation: create, get, getAll, update, delete
+	- Operation: get (single), getAll (search/list)
 
 - Resource: session
 	- Operation: get, getAll
@@ -82,3 +82,26 @@ Contributing
 MIT — see LICENSE file.
 
 For API details, refer to your SendTick API documentation and update the URL/parameters accordingly.
+
+## Search contacts
+
+The Sendtick contacts endpoint supports query parameters to filter and paginate results. Available query parameters:
+
+- query: Search query for name, email, or phone
+- tag: Filter contacts by tag
+- groupId: Filter contacts by group ID
+- limit: Number of contacts to return (max 100)
+- offset: Pagination offset
+
+Example: Search contacts with query and tag
+
+Using fetch
+
+```js
+fetch('https://sendtick.co/api/v1/contacts?query=john&tag=customer&limit=20', {
+  method: 'GET',
+  headers: {
+    'Authorization': 'Bearer YOUR_API_KEY'
+  }
+})
+```
