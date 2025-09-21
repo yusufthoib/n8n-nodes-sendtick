@@ -38,7 +38,7 @@ export class SendtickApi implements ICredentialType {
 	test: ICredentialTestRequest = {
 		request: {
 			baseURL: 'https://sendtick.co',
-			url: '/api/v1/contacts',
+			url: '/contacts',
 		},
 	};
 }

@@ -1,6 +1,11 @@
 import { INodeType, INodeTypeDescription, NodeConnectionType, INodeExecutionData, NodeOperationError } from 'n8n-workflow';
 import { sendtickFields, sendtickOperations } from './SendtickVerbDescription';
 
+// Use a module-level base URL constant because `this.description` may not be
+// populated on the ExecuteContext at runtime in some n8n versions. Reading
+// `this.description.requestDefaults` caused a TypeError in runtime.
+const BASE_URL = 'https://sendtick.co/api/v1';
+
 export class Sendtick implements INodeType {
 	description: INodeTypeDescription = {
 		displayName: 'Sendtick',
@@ -23,7 +28,7 @@ export class Sendtick implements INodeType {
 			},
 		],
 		requestDefaults: {
-			baseURL: 'https://sendtick.co',
+			baseURL: 'https://sendtick.co/api/v1',
 			url: '',
 			headers: {
 				Accept: 'application/json',
@@ -94,9 +99,29 @@ export class Sendtick implements INodeType {
 						throw new NodeOperationError(this.getNode(), 'sessionId is required for sending messages');
 					}
 
-					// Validate `to` format: digits only, no leading '+'
-					if (!/^[0-9]+$/.test(to)) {
-						throw new NodeOperationError(this.getNode(), 'Invalid `to` format. Use digits only without a leading "+" (for example: 60123456789)');
+					// Normalize `to` into API expected format: 60123456789@s.whatsapp.net
+					let normalizedTo = (to || '').trim();
+
+					// If user provided a full JID (contains '@'), accept it but still trim spaces
+					if (!normalizedTo.includes('@')) {
+						// Strip leading '+' if present and any non-digit characters except leading '+'
+						normalizedTo = normalizedTo.replace(/[^0-9+]/g, '');
+						if (normalizedTo.startsWith('+')) {
+							normalizedTo = normalizedTo.slice(1);
+						}
+						// Validate now it's digits only
+						if (!/^[0-9]+$/.test(normalizedTo)) {
+							throw new NodeOperationError(this.getNode(), 'Invalid `to` phone number. Use digits with optional leading "+" (for example: +60123456789) or a full JID like 60123456789@s.whatsapp.net');
+						}
+						// Append the WhatsApp domain expected by the Sendtick API
+						normalizedTo = `${normalizedTo}@s.whatsapp.net`;
+					} else {
+						// If user supplied a JID, remove accidental spaces and validate left side contains digits
+						normalizedTo = normalizedTo.replace(/\s+/g, '');
+						const localPart = normalizedTo.split('@')[0];
+						if (!/^[0-9]+$/.test(localPart)) {
+							throw new NodeOperationError(this.getNode(), 'Invalid `to` JID local part. Expected digits before the @ (for example: 60123456789@s.whatsapp.net)');
+						}
 					}
 
 					// Require either message or mediaUrl
@@ -106,7 +131,7 @@ export class Sendtick implements INodeType {
 
 					const body: { [key: string]: any } = {
 						sessionId,
-						to,
+						to: normalizedTo,
 					};
 					if (message) body.message = message;
 					if (mediaUrl) body.mediaUrl = mediaUrl;
@@ -115,7 +140,8 @@ export class Sendtick implements INodeType {
 					// Use the credential `sendtickApi` (defined in credentials file)
 					const response = await this.helpers.requestWithAuthentication.call(this, 'sendtickApi', {
 						method: 'POST',
-						url: '/api/v1/messages',
+						baseURL: BASE_URL,
+						url: '/messages',
 						body,
 						json: true,
 					});
@@ -133,7 +159,8 @@ export class Sendtick implements INodeType {
 
 						const response = await this.helpers.requestWithAuthentication.call(this, 'sendtickApi', {
 							method: 'POST',
-							url: '/api/v1/contacts',
+							baseURL: BASE_URL,
+							url: '/contacts',
 							body,
 							json: true,
 						});
@@ -143,7 +170,8 @@ export class Sendtick implements INodeType {
 						const contactId = this.getNodeParameter('contactId', i) as string;
 						const response = await this.helpers.requestWithAuthentication.call(this, 'sendtickApi', {
 							method: 'GET',
-							url: `/api/v1/contacts/${contactId}`,
+							baseURL: BASE_URL,
+							url: `/contacts/${contactId}`,
 							json: true,
 						});
 
@@ -153,7 +181,8 @@ export class Sendtick implements INodeType {
 						if (returnAll) {
 							const response = await this.helpers.requestWithAuthentication.call(this, 'sendtickApi', {
 								method: 'GET',
-								url: '/api/v1/contacts',
+								baseURL: BASE_URL,
+								url: '/contacts',
 								json: true,
 							});
 							returnData.push({ json: response as any });
@@ -161,7 +190,8 @@ export class Sendtick implements INodeType {
 							const limit = this.getNodeParameter('limit', i) as number;
 							const response = await this.helpers.requestWithAuthentication.call(this, 'sendtickApi', {
 								method: 'GET',
-								url: '/api/v1/contacts',
+								baseURL: BASE_URL,
+								url: '/contacts',
 								qs: { limit },
 								json: true,
 							});
@@ -178,7 +208,8 @@ export class Sendtick implements INodeType {
 
 						const response = await this.helpers.requestWithAuthentication.call(this, 'sendtickApi', {
 							method: 'PUT',
-							url: `/api/v1/contacts/${contactId}`,
+							baseURL: BASE_URL,
+							url: `/contacts/${contactId}`,
 							body,
 							json: true,
 						});
@@ -188,7 +219,8 @@ export class Sendtick implements INodeType {
 						const contactId = this.getNodeParameter('contactId', i) as string;
 						const response = await this.helpers.requestWithAuthentication.call(this, 'sendtickApi', {
 							method: 'DELETE',
-							url: `/api/v1/contacts/${contactId}`,
+							baseURL: BASE_URL,
+							url: `/contacts/${contactId}`,
 							json: true,
 						});
 
@@ -201,7 +233,8 @@ export class Sendtick implements INodeType {
 
 						const response = await this.helpers.requestWithAuthentication.call(this, 'sendtickApi', {
 							method: 'POST',
-							url: '/api/v1/media',
+							baseURL: BASE_URL,
+							url: '/media',
 							body,
 							json: true,
 						});
@@ -211,7 +244,8 @@ export class Sendtick implements INodeType {
 						const mediaId = this.getNodeParameter('mediaId', i) as string;
 						const response = await this.helpers.requestWithAuthentication.call(this, 'sendtickApi', {
 							method: 'GET',
-							url: `/api/v1/media/${mediaId}`,
+							baseURL: BASE_URL,
+							url: `/media/${mediaId}`,
 							json: true,
 						});
 
@@ -221,7 +255,8 @@ export class Sendtick implements INodeType {
 						if (returnAll) {
 							const response = await this.helpers.requestWithAuthentication.call(this, 'sendtickApi', {
 								method: 'GET',
-								url: '/api/v1/media',
+								baseURL: BASE_URL,
+								url: '/media',
 								json: true,
 							});
 							returnData.push({ json: response as any });
@@ -229,7 +264,8 @@ export class Sendtick implements INodeType {
 							const limit = this.getNodeParameter('limit', i) as number;
 							const response = await this.helpers.requestWithAuthentication.call(this, 'sendtickApi', {
 								method: 'GET',
-								url: '/api/v1/media',
+								baseURL: BASE_URL,
+								url: '/media',
 								qs: { limit },
 								json: true,
 							});
@@ -240,7 +276,8 @@ export class Sendtick implements INodeType {
 					if (operation === 'getAll') {
 						const response = await this.helpers.requestWithAuthentication.call(this, 'sendtickApi', {
 							method: 'GET',
-							url: '/api/v1/sessions',
+							baseURL: BASE_URL,
+							url: '/sessions',
 							json: true,
 						});
 
@@ -249,7 +286,8 @@ export class Sendtick implements INodeType {
 						const sessionId = this.getNodeParameter('sessionId', i) as string;
 						const response = await this.helpers.requestWithAuthentication.call(this, 'sendtickApi', {
 							method: 'GET',
-							url: `/api/v1/sessions/${sessionId}`,
+							baseURL: BASE_URL,
+							url: `/sessions/${sessionId}`,
 							json: true,
 						});
 

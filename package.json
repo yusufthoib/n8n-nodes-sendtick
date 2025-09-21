@@ -1,6 +1,6 @@
 {
-  "name": "n8n-nodes-sendtick",
-  "version": "0.1.1",
+  "name": "n8n-nodes-sendtick-v1",
+  "version": "1.0.5",
   "description": "Community node for integrating Sendtick.io API with n8n workflows. Enables automation of tasks and interactions with Sendtick.io directly from n8n.",
   "keywords": [
     "n8n-community-node-package"
@@ -28,17 +28,16 @@
     "prepublishOnly": "npm run build && npm run lint -c .eslintrc.prepublish.js nodes credentials package.json"
   },
   "files": [
-    "dist"
+    "dist",
+    "icons"
   ],
   "n8n": {
     "n8nNodesApiVersion": 1,
     "credentials": [
-      "dist/credentials/ExampleCredentialsApi.credentials.js",
       "dist/credentials/SendtickApi.credentials.js"
     ],
     "nodes": [
-      "dist/nodes/ExampleNode/ExampleNode.node.js",
-      "dist/nodes/sendtick/sendtick.node.js"
+      "dist/nodes/Sendtick/Sendtick.node.js"
     ]
   },
   "devDependencies": {
@@ -51,5 +50,8 @@
   },
   "peerDependencies": {
     "n8n-workflow": "*"
+  },
+  "publishConfig": {
+    "access": "public"
   }
 }
