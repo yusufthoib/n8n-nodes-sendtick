@@ -74,39 +74,6 @@ export const sendtickOperations: INodeProperties[] = [
 		],
 		default: 'getAll',
 	},
-	// Media operations (shown when resource is 'media')
-	{
-		displayName: 'Operation',
-		name: 'operation',
-		type: 'options',
-		noDataExpression: true,
-		displayOptions: {
-			show: {
-				resource: ['media'],
-			},
-		},
-		options: [
-			{
-				name: 'Upload',
-				value: 'upload',
-				description: 'Upload media via a public URL',
-				action: 'Upload media',
-			},
-			{
-				name: 'Get',
-				value: 'get',
-				description: 'Get media metadata',
-				action: 'Get media',
-			},
-			{
-				name: 'Get Many',
-				value: 'getAll',
-				description: 'List media items',
-				action: 'Get many media',
-			},
-		],
-		default: 'upload',
-	},
 	// Session operations (shown when resource is 'session')
 	{
 		displayName: 'Operation',
@@ -199,44 +166,6 @@ const sendOperation: INodeProperties[] = [
 			},
 		},
 	},
-	{
-		displayName: 'Media URL',
-		name: 'mediaUrl',
-		type: 'string',
-		default: '',
-		description: 'Optional public URL to media to send instead of a text message',
-		displayOptions: {
-			show: {
-				resource: ['message'],
-				operation: ['send'],
-			},
-		},
-		routing: {
-			send: {
-				property: 'mediaUrl',
-				type: 'body',
-			},
-		},
-	},
-	{
-		displayName: 'File Name',
-		name: 'fileName',
-		type: 'string',
-		default: '',
-		description: 'Optional filename for document messages',
-		displayOptions: {
-			show: {
-				resource: ['message'],
-				operation: ['send'],
-			},
-		},
-		routing: {
-			send: {
-				property: 'fileName',
-				type: 'body',
-			},
-		},
-	},
 ];
 
 /* -------------------------------------------------------------------------- */
@@ -318,6 +247,61 @@ const contactGetAll: INodeProperties[] = [
 		},
 	},
 	{
+		displayName: 'Search Query',
+		name: 'query',
+		type: 'string',
+		default: '',
+		description: 'Search query for name, email, or phone',
+		displayOptions: {
+			show: {
+				resource: ['contact'],
+				operation: ['getAll'],
+			},
+		},
+	},
+	{
+		displayName: 'Tag',
+		name: 'tag',
+		type: 'string',
+		default: '',
+		description: 'Filter contacts by tag',
+		displayOptions: {
+			show: {
+				resource: ['contact'],
+				operation: ['getAll'],
+			},
+		},
+	},
+	{
+		displayName: 'Group ID',
+		name: 'groupId',
+		type: 'string',
+		default: '',
+		description: 'Filter contacts by group ID',
+		displayOptions: {
+			show: {
+				resource: ['contact'],
+				operation: ['getAll'],
+			},
+		},
+	},
+	{
+		displayName: 'Offset',
+		name: 'offset',
+		type: 'number',
+		default: 0,
+		typeOptions: {
+			minValue: 0,
+		},
+		description: 'Pagination offset',
+		displayOptions: {
+			show: {
+				resource: ['contact'],
+				operation: ['getAll'],
+			},
+		},
+	},
+	{
 		displayName: 'Limit',
 		name: 'limit',
 		type: 'number',
@@ -379,74 +363,6 @@ const contactUpdate: INodeProperties[] = [
 	},
 ];
 
-/* -------------------------------------------------------------------------- */
-/*                                  media ops                                  */
-/* -------------------------------------------------------------------------- */
-const mediaUpload: INodeProperties[] = [
-	{
-		displayName: 'File URL',
-		name: 'fileUrl',
-		type: 'string',
-		default: '',
-		required: true,
-		description: 'Public URL to the file to upload (server will fetch it)',
-		displayOptions: {
-			show: {
-				resource: ['media'],
-				operation: ['upload'],
-			},
-		},
-	},
-];
-
-const mediaGet: INodeProperties[] = [
-	{
-		displayName: 'Media ID',
-		name: 'mediaId',
-		type: 'string',
-		default: '',
-		required: true,
-		displayOptions: {
-			show: {
-				resource: ['media'],
-				operation: ['get'],
-			},
-		},
-	},
-];
-
-const mediaGetAll: INodeProperties[] = [
-	{
-		displayName: 'Return All',
-		name: 'returnAll',
-		type: 'boolean',
-		default: false,
-		description: 'Whether to return all results or only up to a given limit',
-		displayOptions: {
-			show: {
-				resource: ['media'],
-				operation: ['getAll'],
-			},
-		},
-	},
-	{
-		displayName: 'Limit',
-		name: 'limit',
-		type: 'number',
-		default: 50,
-		typeOptions: {
-			minValue: 1,
-		},
-		description: 'Max number of results to return',
-		displayOptions: {
-			show: {
-				resource: ['media'],
-				operation: ['getAll'],
-				returnAll: [false],
-			},
-		},
-	},
-];
 
 /* -------------------------------------------------------------------------- */
 /*                                session operations                           */
@@ -513,12 +429,7 @@ export const sendtickFields: INodeProperties[] = [
 	...contactGetAll,
 	...contactUpdate,
 
-	/* -------------------------------------------------------------------------- */
-	/*                                media operations                            */
-	/* -------------------------------------------------------------------------- */
-	...mediaUpload,
-	...mediaGet,
-	...mediaGetAll,
+
 	/* -------------------------------------------------------------------------- */
 	/*                                session operations                          */
 	/* -------------------------------------------------------------------------- */

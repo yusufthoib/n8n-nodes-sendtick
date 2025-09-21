@@ -1,6 +1,6 @@
 # n8n-nodes-sendtick-v1
 
-Lightweight n8n node set to interact with SendTick (v1) APIs. Provides operations for sending messages, creating contacts, and checking message status from n8n workflows.
+Lightweight n8n node set to interact with Sendtick (v1) APIs. Provides operations for sending messages, creating contacts, and querying sessions from n8n workflows.
 
 ## Features
 - Send messages
@@ -38,25 +38,20 @@ The node uses the credential to sign requests.
 
 ## Nodes and Operations
 
-SendTick node (resource: message | contact | status)
+Sendtick node (resources: message | contact | session)
 
 - Resource: message
 	- Operation: send
-	 - Parameters: to (string or expression), body (string or JSON), contentType (text|markdown|html), from (optional)
-	 - Example: send a transactional message to a phone or chat id.
+	- Parameters: to (string or expression), message (string), sessionId (string)
+	- Example: send a transactional message to a phone or chat id.
 
 - Resource: contact
-	- Operation: create
-	 - Parameters: contactId, name, email, metadata (JSON)
-	 - Operation: update
-	 - Operation: get
+	- Operation: create, get, getAll, update, delete
 
-- Resource: status
-	- Operation: get
-	 - Parameters: messageId
-	 - Returns delivery/read status and timestamps
+- Resource: session
+	- Operation: get, getAll
 
-All operations return JSON. Errors from the SendTick API are forwarded as node errors.
+All operations return JSON. API errors are forwarded as node errors.
 
 ## Example Workflow
 

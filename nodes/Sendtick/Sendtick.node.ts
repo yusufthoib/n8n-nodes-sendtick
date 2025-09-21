@@ -62,10 +62,6 @@ export class Sendtick implements INodeType {
 						value: 'contact',
 					},
 					{
-						name: 'Media',
-						value: 'media',
-					},
-					{
 						name: 'Session',
 						value: 'session',
 					},
@@ -91,8 +87,6 @@ export class Sendtick implements INodeType {
 					const to = this.getNodeParameter('to', i) as string;
 					const sessionId = this.getNodeParameter('sessionId', i) as string;
 					const message = this.getNodeParameter('message', i) as string;
-					const mediaUrl = this.getNodeParameter('mediaUrl', i) as string;
-					const fileName = this.getNodeParameter('fileName', i) as string;
 
 					// Validate required sessionId
 					if (!sessionId) {
@@ -124,9 +118,9 @@ export class Sendtick implements INodeType {
 						}
 					}
 
-					// Require either message or mediaUrl
-					if (!message && !mediaUrl) {
-						throw new NodeOperationError(this.getNode(), 'Either `message` or `mediaUrl` must be provided');
+					// Require message
+					if (!message) {
+						throw new NodeOperationError(this.getNode(), '`message` must be provided');
 					}
 
 					const body: { [key: string]: any } = {
@@ -134,8 +128,7 @@ export class Sendtick implements INodeType {
 						to: normalizedTo,
 					};
 					if (message) body.message = message;
-					if (mediaUrl) body.mediaUrl = mediaUrl;
-					if (fileName) body.fileName = fileName;
+					if (message) body.message = message;
 
 					// Use the credential `sendtickApi` (defined in credentials file)
 					const response = await this.helpers.requestWithAuthentication.call(this, 'sendtickApi', {
@@ -178,25 +171,28 @@ export class Sendtick implements INodeType {
 						returnData.push({ json: response as any });
 					} else if (operation === 'getAll') {
 						const returnAll = this.getNodeParameter('returnAll', i) as boolean;
-						if (returnAll) {
-							const response = await this.helpers.requestWithAuthentication.call(this, 'sendtickApi', {
-								method: 'GET',
-								baseURL: BASE_URL,
-								url: '/contacts',
-								json: true,
-							});
-							returnData.push({ json: response as any });
-						} else {
-							const limit = this.getNodeParameter('limit', i) as number;
-							const response = await this.helpers.requestWithAuthentication.call(this, 'sendtickApi', {
-								method: 'GET',
-								baseURL: BASE_URL,
-								url: '/contacts',
-								qs: { limit },
-								json: true,
-							});
-							returnData.push({ json: response as any });
-						}
+						// Common optional query parameters
+						const query = this.getNodeParameter('query', i) as string;
+						const tag = this.getNodeParameter('tag', i) as string;
+						const groupId = this.getNodeParameter('groupId', i) as string;
+						const offset = this.getNodeParameter('offset', i) as number;
+						const limit = this.getNodeParameter('limit', i) as number;
+
+						const qs: { [key: string]: any } = {};
+						if (query) qs.query = query;
+						if (tag) qs.tag = tag;
+						if (groupId) qs.groupId = groupId;
+						if (typeof offset !== 'undefined' && offset !== null) qs.offset = offset;
+						if (!returnAll && typeof limit !== 'undefined' && limit !== null) qs.limit = limit;
+
+						const response = await this.helpers.requestWithAuthentication.call(this, 'sendtickApi', {
+							method: 'GET',
+							baseURL: BASE_URL,
+							url: '/contacts',
+							qs,
+							json: true,
+						});
+						returnData.push({ json: response as any });
 					} else if (operation === 'update') {
 						const contactId = this.getNodeParameter('contactId', i) as string;
 						const name = this.getNodeParameter('name', i) as string;
@@ -226,52 +222,7 @@ export class Sendtick implements INodeType {
 
 						returnData.push({ json: response as any });
 					}
-				} else if (resource === 'media') {
-					if (operation === 'upload') {
-						const fileUrl = this.getNodeParameter('fileUrl', i) as string;
-						const body = { url: fileUrl };
 
-						const response = await this.helpers.requestWithAuthentication.call(this, 'sendtickApi', {
-							method: 'POST',
-							baseURL: BASE_URL,
-							url: '/media',
-							body,
-							json: true,
-						});
-
-						returnData.push({ json: response as any });
-					} else if (operation === 'get') {
-						const mediaId = this.getNodeParameter('mediaId', i) as string;
-						const response = await this.helpers.requestWithAuthentication.call(this, 'sendtickApi', {
-							method: 'GET',
-							baseURL: BASE_URL,
-							url: `/media/${mediaId}`,
-							json: true,
-						});
-
-						returnData.push({ json: response as any });
-					} else if (operation === 'getAll') {
-						const returnAll = this.getNodeParameter('returnAll', i) as boolean;
-						if (returnAll) {
-							const response = await this.helpers.requestWithAuthentication.call(this, 'sendtickApi', {
-								method: 'GET',
-								baseURL: BASE_URL,
-								url: '/media',
-								json: true,
-							});
-							returnData.push({ json: response as any });
-						} else {
-							const limit = this.getNodeParameter('limit', i) as number;
-							const response = await this.helpers.requestWithAuthentication.call(this, 'sendtickApi', {
-								method: 'GET',
-								baseURL: BASE_URL,
-								url: '/media',
-								qs: { limit },
-								json: true,
-							});
-							returnData.push({ json: response as any });
-						}
-					}
 				} else if (resource === 'session') {
 					if (operation === 'getAll') {
 						const response = await this.helpers.requestWithAuthentication.call(this, 'sendtickApi', {
