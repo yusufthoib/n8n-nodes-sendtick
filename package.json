@@ -1,6 +1,6 @@
 {
   "name": "n8n-nodes-sendtick-v1",
-  "version": "1.0.6",
+  "version": "1.0.9",
   "description": "Community node for integrating Sendtick.io API with n8n workflows. Enables automation of tasks and interactions with Sendtick.io directly from n8n.",
   "keywords": [
     "n8n-community-node-package"
@@ -50,6 +50,10 @@
   },
   "peerDependencies": {
     "n8n-workflow": "*"
+  },
+  "overrides": {
+    "axios": "1.12.2",
+    "form-data": "4.0.4"
   },
   "publishConfig": {
     "access": "public"
