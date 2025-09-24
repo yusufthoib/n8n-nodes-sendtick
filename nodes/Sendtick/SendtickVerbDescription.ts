@@ -148,6 +148,25 @@ const sendOperation: INodeProperties[] = [
 			},
 		},
 	},
+	{
+		displayName: 'Media URL',
+		name: 'mediaUrl',
+		type: 'string',
+		default: '',
+		description: 'Public URL to an image or media to send (e.g. https://example.com/image.jpg)',
+		displayOptions: {
+			show: {
+				resource: ['message'],
+				operation: ['send'],
+			},
+		},
+		routing: {
+			send: {
+				property: 'mediaUrl',
+				type: 'body',
+			},
+		},
+	},
 ];
 
 /* -------------------------------------------------------------------------- */

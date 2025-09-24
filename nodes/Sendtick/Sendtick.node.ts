@@ -87,6 +87,7 @@ export class Sendtick implements INodeType {
 					const to = this.getNodeParameter('to', i) as string;
 					const sessionId = this.getNodeParameter('sessionId', i) as string;
 					const message = this.getNodeParameter('message', i) as string;
+	                    const mediaUrl = this.getNodeParameter('mediaUrl', i) as string;
 
 					// Validate required sessionId
 					if (!sessionId) {
@@ -128,7 +129,14 @@ export class Sendtick implements INodeType {
 						to: normalizedTo,
 					};
 					if (message) body.message = message;
-					if (message) body.message = message;
+					// If mediaUrl provided, validate simple http(s) URL and include it
+					if (mediaUrl) {
+						const trimmed = mediaUrl.trim();
+						if (!/^https?:\/\/.+/i.test(trimmed)) {
+							throw new NodeOperationError(this.getNode(), '`mediaUrl` must be a valid http(s) URL');
+						}
+						body.mediaUrl = trimmed;
+					}
 
 					// Use the credential `sendtickApi` (defined in credentials file)
 					const response = await this.helpers.requestWithAuthentication.call(this, 'sendtickApi', {
